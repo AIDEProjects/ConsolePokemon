@@ -1,14 +1,22 @@
 package consolepokemon.core;
 
-public class Yabi
+public abstract class Yabi
 {
 	public String name="Yabi";
-	public float health;
-	public float maxHealth=20;
+	public float hp;
+	public float maxHp=20;
 	
 	public float atk=5;
+	public float dex=3;
 	
 	public Yabi(){
-		health = maxHealth;
+		init();
 	}
+	
+	public void init(){
+		initProps();
+		hp = maxHp;
+	}
+	
+	public abstract void initProps();
 }
