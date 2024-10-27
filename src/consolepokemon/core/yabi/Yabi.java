@@ -27,7 +27,16 @@ public abstract class Yabi
 	}
 	
 	public void attack(Yabi victim){
-		System.out.println(name+"攻击了"+victim.name+"造成"+atk+"点伤害，"+victim.name+"剩余血量："+(victim.getHp()-atk));
-		victim.setHp(victim.getHp() - atk);
+		System.out.println(name+"攻击了"+victim.name+"造成"+atk+"点伤害");
+		victim.hurt(atk);
+	}
+	
+	public void hurt(float damage){
+		setHp(getHp() - damage);
+		if(isAlive()){
+			System.out.println(name+"受到了"+damage+"点伤害，剩余血量："+getHp());
+		}else{
+			System.out.println(name+"受到了"+damage+"点致命伤害，剩余血量："+getHp()+", "+name+"死亡");
+		}
 	}
 }

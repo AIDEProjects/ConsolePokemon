@@ -47,6 +47,7 @@ public class FightSystem
 		if(action==0){
 			yabi1.attack(yabi2);
 			if(isDefeat(yabi2)){
+				System.out.println(yabi2.name+"战败");
 				turnCompleted(yabi1, yabi2);
 			}
 		}
