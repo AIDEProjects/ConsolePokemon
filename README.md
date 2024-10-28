@@ -1,2 +1,1 @@
-# TestJavaConsoleApp
-测试各种java问题
+# ConsolePokeon 控制台宝可梦
