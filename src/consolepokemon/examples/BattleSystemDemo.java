@@ -20,11 +20,11 @@ public class BattleSystemDemo
 		
 		Scanner scan = new Scanner(System.in);
 		String str = "";
-		System.out.println("你是: "+you.name+"\n");
+		System.out.println("你是: "+you.name);
 		while(!fs.isCompleted()){
 			Yabi yabi = fs.current();
 			int action = 0;
-			System.out.println("选择"+yabi.name+"的操作: (0)attack (1)flee");
+			System.out.println("\n选择"+yabi.name+"的操作: (0)attack (1)flee");
 			if(yabi == you){
 				if(scan.hasNext()){
 					str = scan.nextLine();
