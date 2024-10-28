@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ArrayList;
 import consolepokemon.core.yabi.Yabi;
 import java.util.Random;
+import tools.Log;
 
 public class BattleSystemDemo
 {
@@ -20,27 +21,48 @@ public class BattleSystemDemo
 		
 		Scanner scan = new Scanner(System.in);
 		String str = "";
-		System.out.println("你是: "+you.name);
+		int i=0;
+		Log.v("----------");
+		for(Yabi n : yabis){
+			Log.v(n==you?"你":"对方");
+			Log.yabi(n);
+			if(i++%2==0){
+				Log.v();
+			}
+		}
+		Log.v("----------");
+		Log.v();
+		i=0;
 		while(!fs.isCompleted()){
 			Yabi yabi = fs.current();
 			int action = 0;
-			System.out.println("\n选择"+yabi.name+"的操作: (0)attack (1)flee");
+			if(fs.isNonSelected()){
+				Log.v("----------");
+			}
+			Log.v("选择"+yabi.name+"的操作: (0)attack (1)flee");
 			if(yabi == you){
 				if(scan.hasNext()){
 					str = scan.nextLine();
 					action = Integer.parseInt(str);
-					System.out.println("你-"+yabi.name+"选择了"+(action==1?"逃跑":"攻击"));
+					Log.v("你-"+yabi.name+"选择了"+(action==1?"逃跑":"攻击"));
 				}
 			}else{
-				action = (int)Math.round(new Random().nextDouble()<0.25f?1:0);
-				System.out.println("AI-"+yabi.name+"选择了"+(action==1?"逃跑":"攻击"));
+				action = Math.round(new Random().nextDouble()<0.25f?1:0);
+				Log.v("AI-"+yabi.name+"选择了"+(action==1?"逃跑":"攻击"));
 			}
+			
 			fs.turnAction(yabi, action);
-			if(fs.isAllSelected()){
-				System.out.println("");
+			if(i++%2==0){
+				Log.v();
 			}
+			if(fs.isAllSelected()){
+				Log.v("----------");
+				Log.v("");
+				new Scanner(System.in).nextLine();
+			}
+			
 			fs.turnStep();
 		}
-		System.out.println("战斗结束，退出");
+		Log.v("战斗结束，退出");
 	}
 }

@@ -14,6 +14,6 @@ public class TorpidWooden extends Yabi
 		name = getName();
 		maxHp = getMaxHealth();
 		atk=7;
-		dex=2;
+		sp=2;
 	}
 }

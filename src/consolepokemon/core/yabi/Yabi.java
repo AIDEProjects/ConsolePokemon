@@ -1,4 +1,5 @@
 package consolepokemon.core.yabi;
+import tools.Log;
 
 public abstract class Yabi
 {
@@ -9,7 +10,7 @@ public abstract class Yabi
 	public float maxHp=20;
 
 	public float atk=5;
-	public float dex=3;
+	public float sp=3;
 
 	public Yabi(){
 		init();
@@ -27,16 +28,16 @@ public abstract class Yabi
 	}
 	
 	public void attack(Yabi victim){
-		System.out.println(name+"攻击了"+victim.name+"造成"+atk+"点伤害");
+		Log.v(name+"攻击了"+victim.name+"造成"+atk+"点伤害");
 		victim.hurt(atk);
 	}
 	
 	public void hurt(float damage){
 		setHp(getHp() - damage);
 		if(isAlive()){
-			System.out.println(name+"受到了"+damage+"点伤害，剩余血量："+getHp());
+			Log.v(name+"受到了"+damage+"点伤害，剩余血量："+getHp());
 		}else{
-			System.out.println(name+"受到了"+damage+"点致命伤害，剩余血量："+getHp()+", "+name+"死亡");
+			Log.v(name+"受到了"+damage+"点致命伤害，剩余血量："+getHp()+", "+name+"死亡");
 		}
 	}
 }

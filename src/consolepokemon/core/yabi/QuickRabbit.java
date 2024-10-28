@@ -11,6 +11,6 @@ public class QuickRabbit extends Yabi
 		name = getName();
 		maxHp = 15;
 		atk = 3;
-		dex=6;
+		sp=6;
 	}
 }

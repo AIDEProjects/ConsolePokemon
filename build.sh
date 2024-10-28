@@ -7,7 +7,8 @@ read -p "请输入版本号 (例如 0.1.0): " version
 mkdir -p outputs
 
 # 编译 Java 文件
-find src -name "*.java" -exec javac -Xlint:-options -source 1.7 -target 1.7 -d outputs {} +
+# find src -name "*.java" -exec javac -Xlint:-options -source 1.7 -target 1.7 -d outputs {} +
+
 
 # 创建清单文件
 echo "Manifest-Version: $version" > MANIFEST.MF

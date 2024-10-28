@@ -28,7 +28,7 @@ public class YabiDemo
 			+"\n"+"亚比MAXHP："+yabi.maxHp
 			+"\n"+"亚比HP："+yabi.hp
 			+"\n"+"亚比ATK："+yabi.atk
-			+"\n"+"亚比DEX："+yabi.dex
+			+"\n"+"亚比DEX："+yabi.sp
 		);
 	}
 }
