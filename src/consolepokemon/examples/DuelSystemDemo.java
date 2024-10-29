@@ -1,17 +1,18 @@
 package consolepokemon.examples;
-import consolepokemon.core.yabi.TorpidWooden;
-import consolepokemon.core.yabi.QuickRabbit;
-import consolepokemon.core.turnsystem.FightSystem;
+import consolepokemon.core.yabis.TorpidWooden;
+import consolepokemon.core.yabis.QuickRabbit;
+import consolepokemon.core.systems.turnsystem.FightSystem;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
-import consolepokemon.core.yabi.Yabi;
+import consolepokemon.core.yabis.Yabi;
 import java.util.Random;
 import tools.Log;
+import consolepokemon.core.utils.*;
 
-public class BattleSystemDemo
+public class DuelSystemDemo
 {
-	public BattleSystemDemo(){
+	public DuelSystemDemo(){
 		List<Yabi> yabis = new ArrayList<>();
 		Yabi you = new TorpidWooden();
 		yabis.add(you);
@@ -47,7 +48,7 @@ public class BattleSystemDemo
 					Log.v("你-"+yabi.name+"选择了"+(action==1?"逃跑":"攻击"));
 				}
 			}else{
-				action = Math.round(new Random().nextDouble()<0.25f?1:0);
+				action = Math.round(Utils.ran()<0.15f?1:0);
 				Log.v("AI-"+yabi.name+"选择了"+(action==1?"逃跑":"攻击"));
 			}
 			

@@ -1,5 +1,5 @@
-package consolepokemon.core.turnsystem;
-import consolepokemon.core.yabi.*;
+package consolepokemon.core.systems.turnsystem;
+import consolepokemon.core.yabis.*;
 import java.util.*;
 import tools.*;
 import java.util.function.*;
@@ -74,6 +74,8 @@ public class FightSystem
 			{
 				Log.v(yabi2.name + "战败");
 				turnCompleted(yabi1, yabi2);
+			}else{
+				Log.yabiStatus(yabi2);
 			}
 		}
 		if (action == 1)
@@ -101,7 +103,7 @@ public class FightSystem
 	//是否优先行动
 	public boolean isFirst(Yabi first, Yabi second)
 	{
-		return first.sp > second.sp;
+		return first.SP > second.SP;
 	}
 
 	//是否都已决策

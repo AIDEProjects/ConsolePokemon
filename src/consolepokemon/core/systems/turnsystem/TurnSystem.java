@@ -1,4 +1,4 @@
-package consolepokemon.core.turnsystem;
+package consolepokemon.core.systems.turnsystem;
 
 public abstract class TurnSystem
 {
