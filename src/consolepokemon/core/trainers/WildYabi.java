@@ -3,7 +3,7 @@ import consolepokemon.core.yabis.*;
 
 public class WildYabi extends Trainer
 {
-	public Card getCard(){ return ITrainer.Card.WildYabi; }
+	public Card getCard(){ return Trainer.Card.WildYabi; }
 	
 	public static WildYabi newWildYabi(Class<? extends Yabi> clazz){
 		var wildYabi = new WildYabi();
@@ -11,5 +11,11 @@ public class WildYabi extends Trainer
 		wildYabi.addYabi(clazz.newInstance());
 		}catch(Exception e){}
 		return wildYabi;
+	}
+
+	@Override
+	public String displayName()
+	{
+		return String.format("{%d-%s:%s-%s}", getUuid(), getCard().name, getYabis().get(0).name, getStatus().name);
 	}
 }

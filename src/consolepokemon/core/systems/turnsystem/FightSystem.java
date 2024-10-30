@@ -4,28 +4,12 @@ import java.util.*;
 import tools.*;
 import java.util.function.*;
 
-public class FightSystem
+public class FightSystem extends TurnSystem<Yabi>
 {
-	private List<Yabi> yabis = new ArrayList<>();
-	private List<Integer> actions = new ArrayList<>();
-	private boolean isCompleted;
-	public boolean isCompleted()
-	{ return isCompleted; }
-
-	public FightSystem(Yabi yabi, Yabi yabi2)
-	{
-		yabis.add(yabi);
-		actions.add(-1);
-		yabis.add(yabi2);
-		actions.add(-1);
-	}
-
-	//指定行动
-	public void turnAction(Yabi yabi, int action)
-	{
-		actions.set(yabis.indexOf(yabi), action);
-		exchange();
-	}
+	private List<Yabi> yabis = super.duelers;
+	
+	public FightSystem(){}
+	public FightSystem(Yabi yabi, Yabi yabi2){ super(yabi, yabi2); }
 
 	//回合步进
 	public void turnStep()
@@ -65,6 +49,9 @@ public class FightSystem
 	}
 
 	//执行行动
+	//action 0 攻击
+	//action 1 逃跑
+	//action 2 切换亚比
 	public boolean turnStep(Yabi yabi1, Yabi yabi2, int action)
 	{
 		if (action == 0)
@@ -72,6 +59,7 @@ public class FightSystem
 			yabi1.attack(yabi2);
 			if (isDefeat(yabi2))
 			{
+				isCompleted = true;
 				Log.v(yabi2.name + "战败");
 				turnCompleted(yabi1, yabi2);
 			}else{
@@ -80,6 +68,7 @@ public class FightSystem
 		}
 		if (action == 1)
 		{
+			isCompleted = true;
 			Log.v(yabi1.name + "逃跑了，战斗结束");
 			turnCompleted(yabi2, yabi1);
 		}
@@ -89,7 +78,6 @@ public class FightSystem
 	//回合结束，决出胜者
 	public void turnCompleted(Yabi winner, Yabi loser)
 	{
-		isCompleted = true;
 		Log.v("战斗结束：胜者-" + winner.name + ", 败者-" + loser.name);
 		Log.v("----------\n");
 	}
@@ -130,5 +118,14 @@ public class FightSystem
 	{
 		yabis.add(yabis.remove(0));
 		actions.add(actions.remove(0));
+	}
+	
+	public void cgYabi(Yabi old, Yabi now){
+		if(!yabis.contains(old)){
+			throw new NoSuchElementException("切换亚比失败，找不到被切换的亚比.");
+		}
+		var index = yabis.indexOf(old);
+		yabis.remove(old);
+		yabis.add(index, now);
 	}
 }

@@ -5,7 +5,13 @@ import consolepokemon.core.utils.*;
 
 public abstract class Yabi
 {
+	public static int uuidSeed;
+	private int uuid;
+	public int getUuid(){ return uuid; }
 	public String name="Yabi";
+	public String getName() { return name; }
+	@Override
+	public String toString(){ return String.format("{%d:%s}", uuid, name); }
 	public float HP;
 	public float getHP() { return HP; }
 	public void setHP(float HP) { this.HP = HP; }
@@ -13,7 +19,7 @@ public abstract class Yabi
 
 	public float ATK=5;//攻击
 	public float SP=3;//速度
-	public float CRIT=0.2f;//暴击率
+	public float CRIT=0.5f;//暴击率
 	public float CRITVAL = 2f;//暴击倍率
 
 	public Yabi(){
@@ -21,6 +27,7 @@ public abstract class Yabi
 	}
 
 	public void init(){
+		uuid = uuidSeed++;
 		initProps();
 		HP = maxHP;
 	}
@@ -34,16 +41,16 @@ public abstract class Yabi
 	public void attack(Yabi victim){
 		var isCritical = Utils.ran() < CRIT;
 		var damage = (isCritical ? CRITVAL : 1) * ATK;
-		Log.v(name+"攻击了"+victim.name+"造成"+damage+"点"+(isCritical?"暴击":"")+"伤害");
+		Log.v(name+(isCritical?"💥":"⚔️")+victim.name+"-"+damage+"💖");
 		victim.hurt(damage);
 	}
 	
 	public void hurt(float damage){
 		setHP(getHP() - damage);
 		if(isAlive()){
-			Log.v(name+"受到了"+damage+"点伤害，剩余血量："+getHP());
+			Log.v(name+"-"+damage+"💖，剩余💖："+getHP());
 		}else{
-			Log.v(name+"受到了"+damage+"点致命伤害，剩余血量："+getHP()+", "+name+"死亡");
+			Log.v(name+"-"+damage+"💖|致命，剩余💖："+getHP()+", "+name+"💀");
 		}
 	}
 }

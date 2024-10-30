@@ -4,6 +4,7 @@ import tools.*;
 public class Test_0_3_0
 {
 	public Test_0_3_0(){
+		/*
 		Log.v("TestPlayer");
 		new TestPlayer();
 
@@ -12,5 +13,9 @@ public class Test_0_3_0
 
 		Log.v("\nTestDuelMatcher");
 		new TestDuelMatcher();
+		*/
+		
+		Log.v("\nTestTrainerDuelSystem");
+		new TestTrainerDuelSystem();
 	}
 }
