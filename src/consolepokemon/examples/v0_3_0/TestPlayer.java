@@ -13,7 +13,7 @@ public class TestPlayer
 		
 		System.out.println("玩家亚比列表: ");
 		int i=0;
-		for(Yabi y : player.yabis){
+		for(Yabi y : player.getYabis()){
 			Log.v(i++);
 			Log.yabi(y);
 		}

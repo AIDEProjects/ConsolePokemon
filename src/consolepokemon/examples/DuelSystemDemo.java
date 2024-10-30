@@ -33,7 +33,14 @@ public class DuelSystemDemo
 		}
 		Log.v("----------");
 		Log.v();
-		i=0;
+		startDuel(fs, you);
+	}
+
+	public static void startDuel(FightSystem fs, Yabi you)
+	{
+		var scan = new Scanner(System.in);
+		int i=0;
+		String str="";
 		while(!fs.isCompleted()){
 			Yabi yabi = fs.current();
 			int action = 0;
@@ -51,7 +58,7 @@ public class DuelSystemDemo
 				action = Math.round(Utils.ran()<0.15f?1:0);
 				Log.v("AI-"+yabi.name+"选择了"+(action==1?"逃跑":"攻击"));
 			}
-			
+
 			fs.turnAction(yabi, action);
 			if(i++%2==0){
 				Log.v();
@@ -61,7 +68,7 @@ public class DuelSystemDemo
 				Log.v("");
 				new Scanner(System.in).nextLine();
 			}
-			
+
 			fs.turnStep();
 		}
 		Log.v("战斗结束，退出");

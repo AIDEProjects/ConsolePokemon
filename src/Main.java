@@ -11,6 +11,8 @@ public class Main {
 		
 		//new DuelSystemDemo();
 		
-		new Test_0_3_0();
+		//new Test_0_3_0();
+		
+		new V_0_3_0_Demo();
     }
 }
