@@ -1,8 +1,8 @@
 package consolepokemon.examples.v0_3_0;
+
+import consolepokemon.core.trainers.*;
 import consolepokemon.core.yabis.*;
 import tools.*;
-import consolepokemon.core.*;
-import consolepokemon.core.trainers.*;
 
 public class TestPlayer
 {

@@ -12,14 +12,14 @@ public abstract class Trainer
 		Defeat("已战败");
 
 		public final String name;
-		public Status(String name){this.name = name;}
+		private Status(String name){this.name = name;}
 	}
 	public enum Card{
 		WildYabi("野生亚比"), 
 		Human("人类");
 
 		public final String name;
-		public Card(String name){this.name = name;}
+		private Card(String name){this.name = name;}
 	}
 	public static int uuidSeed;
 	
