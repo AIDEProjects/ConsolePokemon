@@ -21,6 +21,9 @@ public abstract class TurnSystem<T>
 	public void enterDuel(T dueler, T dueler2)
 	{
 		isCompleted = false;
+		duelers.clear();
+		actions.clear();
+		
 		duelers.add(dueler);
 		actions.add(-1);
 		duelers.add(dueler2);
@@ -36,15 +39,19 @@ public abstract class TurnSystem<T>
 	//回合步进
 	public void turnStep()
 	{
-		if(isAllSelected() || isNonSelected()){
+		var nonSelected = isNonSelected();
+		var allSelected = isAllSelected();
+		if(allSelected || nonSelected){
 			//决定先手
 			if (!isFirst(duelers.get(0), duelers.get(1)))
 			{
 				exchange();
 			}
-			Log.v(duelers.get(0).toString() + "先手");
+			if(allSelected){
+				Log.v(duelers.get(0).toString() + "先手");
+			}
 		}
-		if (isAllSelected())
+		if (allSelected)
 		{
 			//Log.v("----------");
 			//先后执行行动

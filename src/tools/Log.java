@@ -4,6 +4,7 @@ import consolepokemon.core.trainers.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
+import consolepokemon.core.utils.*;
 
 public class Log
 {
@@ -18,6 +19,9 @@ public class Log
 	public static void v(){ Log.v(""); }
 	public static void v(Object str){
 		System.out.println(""+str);
+	}
+	public static void v(Object str, Object... args){
+		v(String.format(""+str, args));
 	}
 	
 	public static void clearLine(int line)
@@ -41,20 +45,21 @@ public class Log
     }
 	
 	public static void yabi(Yabi yabi){
-		Log.v(
-			"NAME："+yabi.name
-			+"\n"+"💖HP："+yabi.HP+"/"+yabi.maxHP
-			+"\n"+"⚔️ATK："+yabi.ATK
-			+"\n"+"⚡️SP："+yabi.SP
-			+"\n"+"💥CRIT："+(yabi.CRIT*100)+"%"
-		);
+		Log.v(Icons.format(""
+			+String.format("NAME：%s", yabi.name)
+			+String.format("\n//LV：%d-(✨%.1f/%.1f)", yabi.LV, yabi.EXP, yabi.NeedEXP)
+			+String.format("\n//HP：%.1f/%.1f", yabi.HP, yabi.maxHP)
+			+String.format("\n//ATK️：%.1f", yabi.ATK)
+			+String.format("\n//SP️：%.1f",yabi.SP)
+			+String.format("\n//CRIT：%.1f%%", yabi.CRIT*100)
+		));
 	}
 	
 	public static void yabiStatus(Yabi yabi){
-		Log.v(
-			"NAME："+yabi.name
-			+"\n"+"💖HP："+yabi.HP+"/"+yabi.maxHP
-		);
+		Log.v(Icons.format(""
+			  +String.format("NAME：%s", yabi.name)
+			  +String.format("\n//HP：%.1f/%.1f", yabi.HP, yabi.maxHP)
+		));
 	}
 	
 	public static void trainer(Trainer trainer){

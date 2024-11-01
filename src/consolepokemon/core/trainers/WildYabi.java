@@ -8,7 +8,7 @@ public class WildYabi extends Trainer
 	public static WildYabi newWildYabi(Class<? extends Yabi> clazz){
 		var wildYabi = new WildYabi();
 		try{
-		wildYabi.addYabi(clazz.newInstance());
+			wildYabi.addYabi(clazz.newInstance());
 		}catch(Exception e){}
 		return wildYabi;
 	}

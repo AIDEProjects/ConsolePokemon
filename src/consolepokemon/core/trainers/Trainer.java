@@ -3,9 +3,20 @@ import consolepokemon.core.yabis.*;
 import java.util.*;
 import java.util.stream.*;
 import java.util.function.*;
+import consolepokemon.core.utils.*;
+import tools.*;
 
 public abstract class Trainer
 {
+	/*
+	public String customName="";
+	public String getYabiName(Yabi yabi){
+		if(customName.isBlank()){
+			return String.format("{%d-%s}", yabi.getUuid(), yabi.name);
+		}
+		return String.format("{%d-%s的%s}", yabi.getUuid(), customName, yabi.name);
+	}*/
+	
 	public enum Status{
 		Idle("闲置中"), 
 		Duel("对决中"), 
@@ -21,17 +32,34 @@ public abstract class Trainer
 		public final String name;
 		private Card(String name){this.name = name;}
 	}
-	public static int uuidSeed;
 	
 	public Status status = Status.Idle;
 	public abstract Card getCard();
-	public final int uuid;
+	public final long uuid;
 	
-	public Map<Integer, Yabi> yabis = new HashMap<>();
+	public LinkedHashMap<Long, Yabi> yabis = new LinkedHashMap<>();
 	public Yabi current;
 	
 	public Trainer(){
-		uuid = uuidSeed++;
+		uuid = Utils.newUuid();
+	}
+	
+	public boolean setCurrent(long uuid)
+	{
+		Yabi yabi = getYabi(uuid);
+		if (yabi == null)
+		{
+			Log.v("切换首战亚比失败, 找不到此亚比.");
+			return false;
+		}
+		yabis.remove(yabi.getUuid());
+		var temp = new LinkedHashMap<Long, Yabi>(yabis);
+		yabis.clear();
+		yabis.put(yabi.getUuid(), yabi);
+		yabis.putAll(temp);
+		Log.v("切换首战亚比为" + yabi.toString() + "成功.");
+		current = yabi;
+		return true;
 	}
 	
 	public String displayRepos(){
@@ -43,7 +71,7 @@ public abstract class Trainer
 	@Override
 	public String toString(){ return displayName(); }
 	
-	public int getUuid(){ return this.uuid; }
+	public long getUuid(){ return this.uuid; }
 	
 	public Status getStatus(){ return this.status; }
 	
@@ -52,7 +80,7 @@ public abstract class Trainer
 		status = statu;
 	}
 
-	public Yabi getYabi(int uuid)
+	public Yabi getYabi(long uuid)
 	{
 		return yabis.get(uuid);
 	}

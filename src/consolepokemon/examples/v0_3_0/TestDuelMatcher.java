@@ -24,7 +24,7 @@ public class TestDuelMatcher
 		Log.v("\n输入uuid匹配对局：");
 		var targetUuid = Log.input(0);
 		var target = matcher.getTrainer(targetUuid);
-		Log.v(String.format("发起对局(仅限双方首只亚比)：%s vs %s.", player.displayRepos(), target.displayRepos()));
+		Log.v("发起对局(仅限双方首只亚比)：%s vs %s.", player.displayRepos(), target.displayRepos());
 		matcher.attemptEnterDuel(target);
 	}
 }

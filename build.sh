@@ -8,12 +8,14 @@ rm -r outputs
 mkdir -p outputs
 
 # 编译 Java 文件
-find src -name "*.java" -exec javac -Xlint:-options -source 10 -target 10 -d outputs {} +
+# find src -name "*.java" -exec javac -Xlint:-options -source 10 -target 10 -d outputs {} +
+find src -name "*.java" -exec javac -Xlint:-options -source 10 -target 10 -d outputs -cp libs/gson-2.8.8.jar {} +
 
 
 # 创建清单文件
 echo "Manifest-Version: $version" > MANIFEST.MF
 echo "Main-Class: Main" >> MANIFEST.MF
+echo "Class-Path: libs/gson-2.8.8.jar" >> MANIFEST.MF
 echo "" >> MANIFEST.MF  # 确保文件以空行结束
 
 # 创建 JAR 文件
@@ -25,4 +27,4 @@ cd ..
 
 # 提示用户运行 JAR 文件
 echo "JAR 文件创建完成: consolePokemon_v$version.jar"
-# java -jar consolePokemon_v$version.jar
+java -jar consolePokemon_v$version.jar

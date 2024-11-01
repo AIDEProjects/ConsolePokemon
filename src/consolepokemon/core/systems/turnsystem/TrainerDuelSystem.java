@@ -4,25 +4,60 @@ import java.util.*;
 import tools.*;
 import consolepokemon.core.yabis.*;
 import java.util.function.*;
+import consolepokemon.core.systems.*;
+import consolepokemon.core.utils.*;
 
 public class TrainerDuelSystem extends TurnSystem<Trainer>
 {
-
+	public List<List<Yabi>> engagedYabis = new ArrayList<>();
+	
 	@Override
 	public void enterDuel(Trainer trainer, Trainer trainer2)
 	{
 		super.enterDuel(trainer, trainer2);
 		trainer.setStatus(Trainer.Status.Duel);
 		trainer2.setStatus(Trainer.Status.Duel);
+		
+		engagedYabis.clear();
+		engagedYabis.add(new ArrayList<Yabi>(Arrays.asList(trainer.current)));
+		engagedYabis.add(new ArrayList<Yabi>(Arrays.asList(trainer2.current)));
 	}
 	
 	@Override
 	public void turnCompleted(Trainer winner, Trainer loser)
 	{
 		winner.setStatus(Trainer.Status.Idle);
-		loser.setStatus(Trainer.Status.Defeat);
+		var isLoserDie = !loser.hasActiveYabi();
+		if(isLoserDie){
+			loser.setStatus(Trainer.Status.Defeat);
+		}
 		Log.v("战斗结束：胜者-" + winner.toString() + ", 败者-" + loser.toString());
-		//Log.v("----------\n");
+		
+		//获取经验
+		float gainExp = 0;
+		for(Yabi y : loser.getYabis()){
+			gainExp += y.isAlive() ? 0 : y.productEXP;
+		}
+		var winnerEngagedYabis = engagedYabis.get(duelers.indexOf(winner));
+		float gainExpPart = gainExp / winnerEngagedYabis.size();
+		for(Yabi y : winnerEngagedYabis){
+			y.updateLV(gainExpPart);
+		}
+		
+		//获取晶币
+		if(winner instanceof HumanTrainer){
+			var human = (HumanTrainer)winner;
+			int gainCoin = 0;
+			for(Yabi y : loser.getYabis()){
+				gainCoin += y.isAlive() ? 0 : y.productCoin;
+			}
+			human.gainCoin(gainCoin);
+		}
+		
+		//刷新亚比列表
+		if(isLoserDie){
+			GCore.matcher.spawnWildYabi();
+		}
 	}
 
 	@Override
@@ -34,7 +69,7 @@ public class TrainerDuelSystem extends TurnSystem<Trainer>
 	@Override
 	public boolean isFirst(Trainer first, Trainer second)
 	{
-		return first.current.SP > second.current.SP;
+		return first.current.SP >= second.current.SP;
 	}
 
 	@Override
@@ -43,9 +78,6 @@ public class TrainerDuelSystem extends TurnSystem<Trainer>
 		super.turnAction(trainer, action);
 		var trainer2 = duelers.stream().filter(new Predicate<Trainer>(){public boolean test(Trainer t){ return t != trainer; }}).findFirst().get();
 		turnStep(trainer, trainer2, action, 0);
-		if(!isCompleted){
-			Log.v();
-		}
 	}
 	
 	@Override
@@ -61,7 +93,6 @@ public class TrainerDuelSystem extends TurnSystem<Trainer>
 			if (action == 0)
 			{
 				yabi1.attack(yabi2);
-				Log.yabiStatus(yabi2);
 				if (!yabi2.isAlive())
 				{
 					Log.v(yabi2 + "💀");
@@ -69,17 +100,20 @@ public class TrainerDuelSystem extends TurnSystem<Trainer>
 					if(nextYabi != null){
 						Log.v(trainer2+"下一Yabi出战: "+nextYabi);
 						cgYabi(trainer2, nextYabi);
+						
 					}else{
 						Log.v(trainer2+"已无可用亚比.");
 						isCompleted = true;
 						turnCompleted(trainer, trainer2);
 					}
+				}else{
+					Log.v(Icons.format("%s//HP：%.1f/%.1f", yabi2, yabi2.HP, yabi2.maxHP));
 				}
 			}
 			if (action == 1)
 			{
 				isCompleted = true;
-				Log.v(yabi1 + "逃跑了，战斗结束");
+				Log.v(trainer + "逃跑了，战斗结束");
 				turnCompleted(trainer2, trainer);
 			}
 		}
@@ -91,7 +125,9 @@ public class TrainerDuelSystem extends TurnSystem<Trainer>
 				var cgYabi = Log.input(0);
 				var old = trainer.current;
 				cgYabi(trainer, trainer.getYabi(cgYabi));
-				Log.v(String.format("%s切换亚比: %s -> %s", trainer.getCard().name, old, trainer.current));
+				Log.v("%s切换亚比: %s -> %s", trainer.getCard().name, old, trainer.current);
+				//不损耗行动点
+				super.turnAction(trainer, -1);
 			}
 		}
 		return isCompleted;
@@ -101,7 +137,18 @@ public class TrainerDuelSystem extends TurnSystem<Trainer>
 		if(now == null){
 			throw new IllegalArgumentException("没有找到想要切换到的亚比.");
 		}
-		you.current = now;
+		you.setCurrent(now.getUuid());
+		var youEngagedYabis = engagedYabis.get(duelers.indexOf(you));
+		if(!youEngagedYabis.contains(now)){
+			youEngagedYabis.add(now);
+		}
+	}
+
+	@Override
+	public void exchange()
+	{
+		super.exchange();
+		engagedYabis.add(engagedYabis.remove(0));
 	}
 	
 }
