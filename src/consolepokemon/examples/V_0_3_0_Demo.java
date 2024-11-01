@@ -9,23 +9,71 @@ import consolepokemon.core.utils.*;
 import consolepokemon.core.inventories.*;
 import consolepokemon.core.items.*;
 import com.google.gson.*;
+import consolepokemon.core.datas.*;
+import java.nio.file.*;
+import java.util.*;
 
 public class V_0_3_0_Demo
 {
+	public String gameSavesPath = "/sdcard/consolePokemon/gameSaves.json";
+
+	private DuelMatcher matcher;
+
+	private HumanTrainer player;
+
+	private int targetUuid;
 	public V_0_3_0_Demo(){
+		//var dataM = new DataManager();
+		gson = new GsonBuilder().
+			setPrettyPrinting().
+			create();
+		loadDatas();
+		
 		gameLoop();
 	}
+	
+	public Gson gson;
+	public GameData gameDatas;
+
+	public void loadDatas(){
+		try{
+			File file = new File(gameSavesPath);
+			if(!file.exists()){
+				file.getParentFile().mkdirs();
+				file.createNewFile();
+				gameDatas = new GameData();
+				Log.v("未检测到存档，首次创建数据在：%s.", file.getPath());
+				saveDatas();
+			}
+			var lines = Files.readAllLines(Paths.get(file.getPath()));
+			var fileContent = String.join("\n", lines);
+			gameDatas = gson.fromJson(fileContent, GameData.class);
+			Log.v("数据加载完成.");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	public void saveDatas(){
+		String json = gson.toJson(gameDatas);
+		
+		try{
+			File file = new File(gameSavesPath);
+			Files.write(Paths.get(file.getPath()), Arrays.asList(json.split("\n")));
+			Log.v("数据保存完成.");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 	public void gameLoop(){
 		var game = new GCore();
 		game.matcher = new DuelMatcher();
 		game.dueler = new DuelManager();
 		
-		var matcher = game.matcher;
+		matcher = game.matcher;
 		
-		var player = new HumanTrainer();
+		player = new HumanTrainer();
 		matcher.bindTrainer(player);
-		/*Log.v("输入你的大名: ");
-		player.customName = Log.input("");*/
 
 		var enemyList = new Class[]{TorpidWooden.class, QuickRabbit.class};
 	
@@ -36,28 +84,10 @@ public class V_0_3_0_Demo
 			matcher.addTrainer(wildYabi);
 		}
 
-		Log.v("玩家：");
-		Log.v(player.displayRepos());
-		matcher.showOtherTrainers();
-		Log.v("\n输入uuid匹配对局：");
-		var targetUuid = Log.input(0);
-		var target = matcher.getTrainer(targetUuid);
-		Log.v("发起对局：%s vs %s.", player.displayRepos(), target.displayRepos());
-		matcher.attemptEnterDuel(target);
+		if(!gameDatas.levelDatas.finishNoob){
+			noobTutorial();
+		}
 		
-		Log.v("\n赠送你一只亚比？(0)呆呆木 (1)迅捷兔");
-		var id = Log.input(0);
-		var yabi = id==0?new TorpidWooden():(id==1?new QuickRabbit():null);
-		player.addYabi(yabi);
-		Log.v("你获得了新亚比: {uuid:%d-%s}", yabi.getUuid(), yabi.getName());
-
-		Log.v("\n赠送你一只亚比？(0)呆呆木 (1)迅捷兔");
-		id = Log.input(0);
-		yabi = id==0?new TorpidWooden():(id==1?new QuickRabbit():null);
-		player.addYabi(yabi);
-		Log.v("你获得了新亚比: {uuid:%d-%s}", yabi.getUuid(), yabi.getName());
-
-		Log.v("新手教程结束.");
 		Log.v("help查看指令帮助.");
 		
 		var shop = new Shop();
@@ -65,9 +95,6 @@ public class V_0_3_0_Demo
 		shop.addWares(new BloodCrystal(), 20);
 		shop.getItem(0).setCount(999999);
 		shop.getItem(1).setCount(999999);
-		
-		//var dataM = new DataManager();
-		var gson = new Gson();
 		
 		while(player.hasActiveYabi()){
 			var fullCmd = Log.input("");
@@ -89,7 +116,7 @@ public class V_0_3_0_Demo
 						+"\ninv use <item-index>使用道具"
 						+"\nyabi current <uuid>切换首战亚比"
 						+"\nloots noobCoin领取新手晶币礼包"
-						+"\nsave保存存档文件于同级目录下/saves.json(未开放)"
+						+"\nsave保存存档文件于同级目录下/saves.json"
 					);
 					break;
 				case "q": 
@@ -102,6 +129,7 @@ public class V_0_3_0_Demo
 					player.gainCoin(20);
 					break;
 				case "save": 
+					saveDatas();
 					break;
 				default: 
 				pass = false;
@@ -129,7 +157,7 @@ public class V_0_3_0_Demo
 				case "duel": 
 					if(cmds.length>1){
 						targetUuid = Integer.parseInt(cmds[1]);
-						target = matcher.getTrainer(targetUuid);
+						Trainer target = matcher.getTrainer(targetUuid);
 						Log.v("发起对局：%s vs %s.", player.displayName(), target.displayName());
 						matcher.attemptEnterDuel(target);
 					}
@@ -202,4 +230,32 @@ public class V_0_3_0_Demo
 			System.exit(0);
 		}
 	}
+
+	private void noobTutorial()
+	{
+		Log.v("玩家：");
+		Log.v(player.displayRepos());
+		matcher.showOtherTrainers();
+		Log.v("\n输入uuid匹配对局：");
+		var targetUuid = Log.input(0);
+		var target = matcher.getTrainer(targetUuid);
+		Log.v("发起对局：%s vs %s.", player.displayRepos(), target.displayRepos());
+		matcher.attemptEnterDuel(target);
+
+		Log.v("\n赠送你一只亚比？(0)呆呆木 (1)迅捷兔");
+		var id = Log.input(0);
+		var yabi = id==0?new TorpidWooden():(id==1?new QuickRabbit():null);
+		player.addYabi(yabi);
+		Log.v("你获得了新亚比: {uuid:%d-%s}", yabi.getUuid(), yabi.getName());
+
+		Log.v("\n赠送你一只亚比？(0)呆呆木 (1)迅捷兔");
+		id = Log.input(0);
+		yabi = id==0?new TorpidWooden():(id==1?new QuickRabbit():null);
+		player.addYabi(yabi);
+		Log.v("你获得了新亚比: {uuid:%d-%s}", yabi.getUuid(), yabi.getName());
+
+		Log.v("新手教程结束.");
+		gameDatas.levelDatas.finishNoob = true;
+	}
+	
 }
