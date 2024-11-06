@@ -13,6 +13,7 @@ import consolepokemon.core.datas.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.*;
+import com.goldsprite.consolepokemon.DebugWindow;
 
 public class V0_4_1_Demo
 {
@@ -33,8 +34,6 @@ public class V0_4_1_Demo
 	
 	public V0_4_1_Demo(){
 		loadDatas();
-		
-		globalDatas = new GlobalData();
 		
 		initGame();
 		
@@ -223,8 +222,6 @@ public class V0_4_1_Demo
 										long uuid = Log.input(0L);
 										if(player.setCurrentYabi(uuid)){
 											done = true;
-										}else{
-											Log.v("输入有误：无此亚比.");
 										}
 									}
 									break;

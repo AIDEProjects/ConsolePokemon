@@ -14,6 +14,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import tools.Log;
+import consolepokemon.core.systems.GCore;
 
 public class Inventory
 {
@@ -62,7 +63,8 @@ public class Inventory
 		}
 	}
 	
-	public HumanTrainer owner;
+	private long ownerUuid;
+	public HumanTrainer getOwner(){ return (HumanTrainer)GCore.matcher.getTrainer(ownerUuid); }
 	public List<Item> items = new ArrayList<>();
 	
 	public Inventory(){}
@@ -71,7 +73,7 @@ public class Inventory
 	}
 	
 	public void setOwner(HumanTrainer owner){
-		this.owner = owner;
+		ownerUuid = owner.getUuid();
 	}
 	
 	public void addItem(Item i){
@@ -117,14 +119,14 @@ public class Inventory
 	public void useItem(int index){
 		Item item = getItem(index);
 		if(item !=null){
-			item.use(owner);
+			item.use(getOwner());
 		}
 	}
 
 	public void show(){
 		Log.v("背包物品如下: ");
 		String itemsStr = "";
-		itemsStr += String.format("晶币x%d\n", owner.coin);
+		itemsStr += String.format("晶币x%d\n", getOwner().coin);
 		for(int i=0;i<items.size();i++){
 			Item item = getItem(i);
 			itemsStr +=String.format("{%d-%sx%d}", i, item.getName(), item.count);

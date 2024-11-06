@@ -27,6 +27,11 @@ public class DuelMatcher
 	
 	//是否符合进入对决条件
 	public boolean canEnterDuel(Trainer target){
+		Yabi defeatCurrentYabi = getBindTrainer().getCurrentYabi().isAlive()?(target.getCurrentYabi().isAlive()?null:target.getCurrentYabi()):getBindTrainer().getCurrentYabi();
+		if(defeatCurrentYabi != null){
+			Log.v("进入对决失败，原因：%s首战亚比已战败.", defeatCurrentYabi);
+			return false;
+		}
 		Trainer defeatTrainer = getBindTrainer().hasActiveYabi()?(target.hasActiveYabi()?null:target):getBindTrainer();
 		if(defeatTrainer != null){
 			Log.v("进入对决失败，原因：%s无可出战亚比.", defeatTrainer.displayRepos());

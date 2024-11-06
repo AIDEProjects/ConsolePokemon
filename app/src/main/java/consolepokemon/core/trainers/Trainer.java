@@ -82,6 +82,11 @@ public abstract class Trainer
 			Log.v("切换首战亚比失败, 找不到此亚比.");
 			return false;
 		}
+		if (!yabi.isAlive())
+		{
+			Log.v("切换首战亚比失败, 亚比已战败.");
+			return false;
+		}
 		yabis.remove(yabi.getUuid());
 		LinkedHashMap<Long, Yabi> temp = new LinkedHashMap<Long, Yabi>(yabis);
 		yabis.clear();

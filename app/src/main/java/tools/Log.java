@@ -46,24 +46,33 @@ public class Log {
 		}
 		Log.v(str);
 	}
-
+	
     public static <T> T input(T t) {
 		if (scan == null) {
 			scan = new Scanner(is);
 		}
-		Class<T> type = (Class<T>)t.getClass();
-		if (scan.hasNextLine()) {
-			String userInput = scan.nextLine();
-			Function<String, ?> converter = converters.get(type);
-			if (converter != null) {
-				T inputStr = type.cast(converter.apply(userInput));
-				//System.out.println("接收到数据: " + inputStr);
-				
-				return inputStr;
+		
+		boolean right = false;
+		T inputStr = t;
+		while(!right){
+			Class<T> type = (Class<T>)t.getClass();
+			if (scan.hasNextLine()) {
+				String userInput = scan.nextLine();
+				try{
+					Function<String, ?> converter = converters.get(type);
+					if (converter != null) {
+						inputStr = type.cast(converter.apply(userInput));
+						break;
+					}
+				}catch(Exception e){
+					Log.v("你的输入有误, 请重新输入: ");
+					continue;
+				}
+				right = true;
 			}
-			throw new IllegalArgumentException("不支持的类型: " + type);
 		}
-		throw new NullPointerException("阻塞接收被跳过了.");
+		
+		return inputStr;
     }
 
 	public static void yabi(Yabi yabi) {
