@@ -21,13 +21,13 @@ public class DebugWindow {
 	private static MainActivity ctx;
 	private static DebugWindow instance;
 	private ToggleButton floatingDebugLayout_toggleButton;
-	private LinearLayout floatingDebugLayout;
+	public LinearLayout floatingDebugLayout;
 	private ListView debugInfoList;
 	private ArrayList<String> debugInfos;
 	private ArrayAdapter<String> debugInfoListAdapter;
 
 	private ToggleButton floatingLogLayout_toggleButton;
-	private LinearLayout floatingLogLayout;
+	public LinearLayout floatingLogLayout;
 	private ListView logList;
 	private ArrayList<LogEntry> logs;
 	private static int logsTick;

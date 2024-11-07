@@ -123,7 +123,7 @@ public class CustomEditText extends View {
         viewHeight = MeasureSpec.getSize(heightMeasureSpec);
 		setMeasuredDimension(viewWidth, viewHeight); // 设置视图大小
 		
-		DebugWindow.setDebugInfo(2, String.format("viewWidth: %d, viewHeight: %d", viewWidth, viewHeight));
+		DebugWindow.setDebugInfo(1, String.format("viewWidth: %d, viewHeight: %d", viewWidth, viewHeight));
 
 		// 如果还没有初始化过高度，则进行初始化
         if (!ajustpanInit) {

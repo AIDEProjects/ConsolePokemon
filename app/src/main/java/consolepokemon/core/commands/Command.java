@@ -1,20 +1,11 @@
 package consolepokemon.core.commands;
+import java.util.List;
+import tools.Log;
+import consolepokemon.core.trainers.HumanTrainer;
+import consolepokemon.core.yabis.Yabi;
 
 public class Command {
-    
-	public static String getCmdHint(String cmdHead) {
-		String[] cmdhs = cmdHead.split(" ");
-		String fullCmd = "";
-		for(int i=0;i<cmdhs.length;i++){
-			String cmdh = cmdhs[i];
-			
-			String cmd = "help";
-			if(cmd.startsWith(cmdh)){
-				cmdhs[i] = cmd;
-			}
-			
-		}
-		return String.join(" ", cmdhs);
-	}
+	
+	
 
 }

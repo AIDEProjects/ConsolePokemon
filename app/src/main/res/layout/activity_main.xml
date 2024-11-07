@@ -49,8 +49,9 @@
 				android:id="@+id/floatingDebugLayout_toggleTouchable"
 				android:layout_width="32dp"
 				android:layout_height="32dp"
-				android:textOff="禁"
-				android:textOn="触"
+				android:textOff="挡"
+				android:textOn="透"
+				android:onClick="cgBackground"
 				android:gravity="center"
 				android:textSize="8sp" />
 
@@ -80,7 +81,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="320dp"
 			android:orientation="vertical"
-			android:background="#88EEEEEE" />
+			android:background="#555555" />
 
 		<LinearLayout
 			android:id="@+id/floatingLogLayout"

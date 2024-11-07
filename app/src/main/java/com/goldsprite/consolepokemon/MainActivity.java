@@ -18,8 +18,11 @@ import com.goldsprite.consolepokemon.R;
 import java.lang.Process;
 import android.view.View.OnClickListener;
 import consolepokemon.core.commands.Command;
+import android.graphics.*;
+import consolepokemon.core.commands.CommandHandler;
+import consolepokemon.core.commands.CommandHandler.CMD;
 
-public class MainActivity extends Activity { 
+public class MainActivity extends Activity{ 
 	public static MainActivity instance;
     private MyListView listView;
     private TerminalLine terminalLine;
@@ -42,22 +45,24 @@ public class MainActivity extends Activity {
 	public String gameSavesPath = gameDirPath + "gameSaves.json";
 	public String gameLogsPath = gameDirPath + "logs.txt";
 
-
 	private DebugWindow debugWindow;
 
 	private EditText cmdHint;
+	
+	private boolean debugBackground;
+	
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-		try {
+		try{
 			init();
-		} catch (Exception e) {
+		}catch (Exception e){
 			DebugWindow.addErrLog(e);
 		}
 	}
 
-	private void init() {
+	private void init(){
 		instance = this;
 		requestPermissions(new String[]{
 							   Manifest.permission.WRITE_EXTERNAL_STORAGE, 
@@ -72,11 +77,11 @@ public class MainActivity extends Activity {
 		 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);*/
 
 
-		new Thread(){public void run() {
-				try {
+		new Thread(){public void run(){
+				try{
 					pis.connect(pos);
-					while (true) {
-						if (!cmd.equals("")) {
+					while (true){
+						if (!cmd.equals("")){
 							debugWindow.addLog("新指令: " + cmd);
 							/*Handler h = new Handler();
 							 h.postDelayed(new Runnable(){public void run(){
@@ -91,7 +96,7 @@ public class MainActivity extends Activity {
 						}
 						//Thread.sleep(200);
 					}
-				} catch (Exception e) {
+				}catch (Exception e){
 					debugWindow.addErrLog(e);
 				}
 			}}.start();
@@ -100,7 +105,7 @@ public class MainActivity extends Activity {
 		editText.addText("\n输入start开启游戏.\n");
 		//lineNumbers = (TextView) findViewById(R.id.lineNumbers);
 
-		editText.post(new Runnable(){public void run() {
+		editText.post(new Runnable(){public void run(){
 					updateLineNumbers();
 				}});
 
@@ -108,12 +113,13 @@ public class MainActivity extends Activity {
 
 		editText.setCompletedInputListener(
 			new CustomEditText.CompletedInputListener(){
-				public void onCompletedInput() {
+				public void onCompletedInput(){
 					cmdHandle();
+					updateCmdHint("");
 				}
 			}
 		);
-		
+
 		editText.setTextChangedListener(
 			new CustomEditText.OnTextChangedListener(){
 				public void onTextChanged(){
@@ -142,53 +148,53 @@ public class MainActivity extends Activity {
 
 
 		cmdHint = (EditText) findViewById(R.id.cmdHint);
-		cmdHint.setOnClickListener(
-			new OnClickListener(){
-				public void onClick(View v) {
-					//toast("click");
-				}
-			}
-		);
-	}
-	
-	private void updateCmdHint(){
-		String fullcmd = getFullCmd();
-		String cmdHintStr = Command.getCmdHint(fullcmd);
-		cmdHint.setText(cmdHintStr);
+		
+		cgBackground(null);
 	}
 
-    private void updateLineNumbers() {
+	private void updateCmdHint(){
+		updateCmdHint(getFullCmd());
+	}
+	private void updateCmdHint(String fullCmd){
+		fullCmd = CommandHandler.getCmdHint(fullCmd);
+		cmdHint.setText(fullCmd);
+		boolean right = CommandHandler.isAllRight(fullCmd);
+		int rightColor = Color.parseColor("#000000");
+		int errColor = Color.RED;
+		cmdHint.setTextColor(right ?rightColor: errColor);
+	}
+
+    private void updateLineNumbers(){
 		String text = editText.getText().toString();
 		//int lineCount = getLineCount(text);
 		int lineCount = editText.getLineCount();
 		StringBuilder lineNumbersText = new StringBuilder(); // 用于构建行号的字符串
 
-        for (int i = 1; i <= lineCount; i++) {
+        for (int i = 1; i <= lineCount; i++){
             lineNumbersText.append(i).append(i == lineCount ?"": "\n"); // 添加行号到字符串中
         }
 
         //lineNumbers.setText(lineNumbersText.toString()); // 更新行号显示
     }
 
-	public void cmdHandle() {
+	public void cmdHandle(){
 		final String fullCmd = getFullCmd();
-		//toast(fullCmds);
-		if (started) {
+		if (started){
 			sendCmd(fullCmd);
-		} else 
-		if (!started && fullCmd.equals("start")) {
-			new Thread(){public void run() {
-					try {
+		}else 
+		if (!started && fullCmd.equals("start")){
+			new Thread(){public void run(){
+					try{
 						Log.enableCustomIO(pis, 
 							new Consumer<String>(){
-								public void accept(final String str) {
+								public void accept(final String str){
 									addText(str + "\n");
 								}
 							}
 						);
 						started = true;
 						Main.main(null);
-					} catch (Exception e) {
+					}catch (Exception e){
 						debugWindow.addErrLog(e);
 					}
 				}}.start();
@@ -196,31 +202,29 @@ public class MainActivity extends Activity {
 
 	}
 
-	private String getFullCmd() {
+	private String getFullCmd(){
 		String text = editText.getText().toString();
 		String fullCmd = "";
-		if(text.endsWith("\n")){
-			text = text.substring(0, text.length()-1);
+		if (text.endsWith("\n")){
+			text = text.substring(0, text.length() - 1);
 		}else{
 			int lastLineStart = text.lastIndexOf("\n", text.length());
 			fullCmd = text.substring(Math.max(0, lastLineStart + 1));
 		}
-		DebugWindow.setDebugInfo(3, fullCmd);
 		return fullCmd;
 	}
 
-	public void sendCmd(String cmd) {
+	public void sendCmd(String cmd){
 		this.cmd = cmd;
-		//addText(cmd);
 	}
 
-	public void addText(final String str) {
+	public void addText(final String str){
 		runOnUiThread(
 			new Runnable(){
-				public void run() {
-					try {
+				public void run(){
+					try{
 						editText.addText(str);
-					} catch (Exception e) {
+					}catch (Exception e){
 						debugWindow.addErrLog(e);
 					}
 				}
@@ -229,35 +233,46 @@ public class MainActivity extends Activity {
 	}
 
 
-	public int findNthNewLineIndex(String str, int n) {
+	public int findNthNewLineIndex(String str, int n){
         int index = -1;
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++){
             index = str.indexOf('\n', index + 1);
-            if (index == -1) {
+            if (index == -1){
                 return -1; // 如果找不到第 n 个换行符，提前返回
             }
         }
         return index;
     }
 
-	public int findNthNewLineIndexFromEnd(String str, int n) {
+	public int findNthNewLineIndexFromEnd(String str, int n){
 		int index = str.length(); // 从字符串的末尾开始
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n; i++){
 			index = str.lastIndexOf('\n', index - 1);
-			if (index == -1) {
+			if (index == -1){
 				return -1; // 如果找不到第 n 个换行符，提前返回
 			}
 		}
 		return index;
 	}
+	
+	public void cgBackground(View v){
+		debugBackground = !debugBackground;
+		if(!debugBackground){
+			debugWindow.floatingDebugLayout.setBackgroundColor(Color.parseColor("#88EEEEEE"));
+			debugWindow.floatingLogLayout.setBackgroundColor(Color.parseColor("#88EEEEEE"));
+		}else{
+			debugWindow.floatingDebugLayout.setBackgroundColor(Color.parseColor("#555555"));
+			debugWindow.floatingLogLayout.setBackgroundColor(Color.parseColor("#555555"));
+		}
+	}
 
 
 	static Toast toast;
 
-	public static void toast(final Object str) {
+	public static void toast(final Object str){
 		instance.runOnUiThread(
 			new Runnable() {
-				public void run() {
+				public void run(){
 					toast = Toast.makeText(instance, "" + str, Toast.LENGTH_SHORT);
 					toast.setGravity(Gravity.TOP, 0, 0);
 					toast.show();
