@@ -42,6 +42,7 @@ public class CustomEditText extends View {
 	private StaticLayout staticLayout;
 
 	private CompletedInputListener completedInputListener;
+	private OnTextChangedListener onTextChanged;
 
 	private boolean runErr;
 
@@ -81,6 +82,10 @@ public class CustomEditText extends View {
 
 	public void setCompletedInputListener(CompletedInputListener completedInputListener) {
 		this.completedInputListener = completedInputListener;
+	}
+
+	public void setTextChangedListener(OnTextChangedListener onTextChanged) {
+		this.onTextChanged = onTextChanged;
 	}
 
     private void init(Context context) {
@@ -313,6 +318,7 @@ public class CustomEditText extends View {
         public boolean commitText(CharSequence text, int newCursorPosition) {
             // 将输入的文本添加到 inputText 中
             addText(text.toString());
+			onTextChanged.onTextChanged();
             return true;
         }
 
@@ -320,6 +326,7 @@ public class CustomEditText extends View {
         public boolean deleteSurroundingText(int beforeLength, int afterLength) {
             // 实现删除文字的逻辑
             delChar();
+			onTextChanged.onTextChanged();
             return true;
         }
 
@@ -352,6 +359,9 @@ public class CustomEditText extends View {
 
 	public interface CompletedInputListener {
 		public void onCompletedInput();
+	}
+	public interface OnTextChangedListener {
+		public void onTextChanged();
 	}
 
 }

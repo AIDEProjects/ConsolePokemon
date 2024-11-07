@@ -265,7 +265,7 @@ public class V0_4_1_Demo
 			globalDatas = MyGson.fromJson(fileContent, GlobalData.class);
 			Log.v("数据加载完成: %s", file.getPath());
 		}catch(Exception e){
-			e.printStackTrace();
+			DebugWindow.addErrLog(e);
 		}
 	}
 	public void saveDatas(){
@@ -275,7 +275,7 @@ public class V0_4_1_Demo
 			Files.write(Paths.get(file.getPath()), Arrays.asList(json.split("\n")));
 			Log.v("数据保存完成.");
 		}catch(Exception e){
-			e.printStackTrace();
+			DebugWindow.addErrLog(e);
 		}
 	}
 

@@ -6,6 +6,7 @@ import java.util.function.*;
 import java.util.stream.*;
 import consolepokemon.core.utils.*;
 import java.io.*;
+import tools.MyLambda.*;
 
 public class Log {
 	public static Scanner scan;

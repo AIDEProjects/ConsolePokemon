@@ -5,6 +5,19 @@
 	android:layout_height="match_parent"
 	android:background="#000000">
 	
+	<EditText
+		android:enabled="true"
+		android:focusableInTouchMode="false"
+		android:id="@+id/cmdHint"
+		android:layout_alignParentBottom="true"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:textSize="12sp"
+		android:textColor="#000000"
+		android:background="#AAAAAA"
+		android:hint="命令联想器..."
+		android:text=""/>
+	
 	<com.goldsprite.consolepokemon.CustomEditText
 		android:id="@+id/text"
 		android:layout_width="match_parent"
@@ -16,7 +29,8 @@
 		android:layout_marginLeft="5dp"
 		android:layout_marginRight="5dp"
 		android:layout_marginBottom="5dp"
-		android:focusableInTouchMode="true" />
+		android:focusableInTouchMode="true"
+		android:layout_above="@id/cmdHint"/>
 
 
 	<RelativeLayout

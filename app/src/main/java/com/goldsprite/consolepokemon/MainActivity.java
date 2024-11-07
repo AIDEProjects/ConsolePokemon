@@ -16,6 +16,8 @@ import java.io.*;
 import android.*;
 import com.goldsprite.consolepokemon.R;
 import java.lang.Process;
+import android.view.View.OnClickListener;
+import consolepokemon.core.commands.Command;
 
 public class MainActivity extends Activity { 
 	public static MainActivity instance;
@@ -43,6 +45,8 @@ public class MainActivity extends Activity {
 
 	private DebugWindow debugWindow;
 
+	private EditText cmdHint;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,18 +60,18 @@ public class MainActivity extends Activity {
 	private void init() {
 		instance = this;
 		requestPermissions(new String[]{
-			Manifest.permission.WRITE_EXTERNAL_STORAGE, 
-			Manifest.permission.READ_EXTERNAL_STORAGE}, 101);
+							   Manifest.permission.WRITE_EXTERNAL_STORAGE, 
+							   Manifest.permission.READ_EXTERNAL_STORAGE}, 101);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
 		/*View decorView = getWindow().getDecorView();
-		decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-										| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-										//| View.SYSTEM_UI_FLAG_FULLSCREEN
-										| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-										| View.SYSTEM_UI_FLAG_LAYOUT_STABLE);*/
-		
-		
+		 decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+		 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+		 //| View.SYSTEM_UI_FLAG_FULLSCREEN
+		 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+		 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);*/
+
+
 		new Thread(){public void run() {
 				try {
 					pis.connect(pos);
@@ -79,7 +83,7 @@ public class MainActivity extends Activity {
 							 toast("已超时1000ms无响应");
 							 }}
 							 , 1000);*/
-							pos.write((cmd+"\n").getBytes());
+							pos.write((cmd + "\n").getBytes());
 							pos.flush();
 							debugWindow.addLog("数据已刷出");
 							//h.
@@ -109,24 +113,48 @@ public class MainActivity extends Activity {
 				}
 			}
 		);
+		
+		editText.setTextChangedListener(
+			new CustomEditText.OnTextChangedListener(){
+				public void onTextChanged(){
+					updateCmdHint();
+				}
+			}
+		);
 
 
 		debugWindow = new DebugWindow(this);
 		//test
 		/*new Thread(
-			new Runnable(){
-				public void run(){
-					try{
-						for(int i=0;i<200;i++){
-							addText(Math.random()*10000+"\n");
-							Thread.sleep(50);
-						}
-					}catch(Exception e){
-						DebugWindow.addErrLog(e);
-					}
+		 new Runnable(){
+		 public void run(){
+		 try{
+		 for(int i=0;i<200;i++){
+		 addText(Math.random()*10000+"\n");
+		 Thread.sleep(50);
+		 }
+		 }catch(Exception e){
+		 DebugWindow.addErrLog(e);
+		 }
+		 }
+		 }
+		 ).start();*/
+
+
+		cmdHint = (EditText) findViewById(R.id.cmdHint);
+		cmdHint.setOnClickListener(
+			new OnClickListener(){
+				public void onClick(View v) {
+					//toast("click");
 				}
 			}
-		).start();*/
+		);
+	}
+	
+	private void updateCmdHint(){
+		String fullcmd = getFullCmd();
+		String cmdHintStr = Command.getCmdHint(fullcmd);
+		cmdHint.setText(cmdHintStr);
 	}
 
     private void updateLineNumbers() {
@@ -143,19 +171,21 @@ public class MainActivity extends Activity {
     }
 
 	public void cmdHandle() {
-		String text = editText.getText().toString();
-		int lastLineStart = text.lastIndexOf("\n", text.length() - 2);
-		final String fullCmds = text.substring(Math.max(0, lastLineStart + 1));
+		final String fullCmd = getFullCmd();
 		//toast(fullCmds);
 		if (started) {
-			sendCmd(fullCmds);
+			sendCmd(fullCmd);
 		} else 
-		if (!started && fullCmds.equals("start")) {
+		if (!started && fullCmd.equals("start")) {
 			new Thread(){public void run() {
 					try {
-						Log.enableCustomIO(pis, new Consumer<String>(){public void accept(final String str) {
-									addText(str+"\n");
-								}});
+						Log.enableCustomIO(pis, 
+							new Consumer<String>(){
+								public void accept(final String str) {
+									addText(str + "\n");
+								}
+							}
+						);
 						started = true;
 						Main.main(null);
 					} catch (Exception e) {
@@ -164,6 +194,19 @@ public class MainActivity extends Activity {
 				}}.start();
 		}
 
+	}
+
+	private String getFullCmd() {
+		String text = editText.getText().toString();
+		String fullCmd = "";
+		if(text.endsWith("\n")){
+			text = text.substring(0, text.length()-1);
+		}else{
+			int lastLineStart = text.lastIndexOf("\n", text.length());
+			fullCmd = text.substring(Math.max(0, lastLineStart + 1));
+		}
+		DebugWindow.setDebugInfo(3, fullCmd);
+		return fullCmd;
 	}
 
 	public void sendCmd(String cmd) {
