@@ -128,7 +128,7 @@ public class FightSystem extends TurnSystem<Yabi>
 	
 	public void cgYabi(Yabi old, Yabi now){
 		if(!yabis.contains(old)){
-			throw new NoSuchElementException("切换亚比失败，找不到被切换的亚比.");
+			Log.v("切换亚比失败，找不到被切换的亚比.");
 		}
 		int index = yabis.indexOf(old);
 		yabis.remove(old);

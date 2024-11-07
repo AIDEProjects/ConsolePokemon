@@ -1,4 +1,5 @@
 package consolepokemon.core.trainers;
+import com.goldsprite.consolepokemon.DebugWindow;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -41,7 +42,8 @@ public abstract class Trainer
 				Trainer src = context.deserialize(jsonObject.get("data"), clazz);
 				return src;
 			} catch (ClassNotFoundException e) {
-				throw new JsonParseException("Unknown type: " + typeName, e);
+				DebugWindow.addErrLog(new JsonParseException("Unknown type: " + typeName, e));
+				return null;
 			}
 		}
 	}

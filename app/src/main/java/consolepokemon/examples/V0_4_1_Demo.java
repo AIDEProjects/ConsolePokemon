@@ -58,7 +58,7 @@ public class V0_4_1_Demo
 			player = (HumanTrainer)matcher.getBindTrainer();
 		}
 
-		if(!globalDatas.gameDatas.finishNoob_shop){
+		if(!globalDatas.gameDatas.finishNoob){
 			shop = globalDatas.gameDatas.shop = new Shop();
 			shop.addWares(new NutrientBooster(), 10);
 			shop.addWares(new BloodCrystal(), 20);
@@ -113,6 +113,8 @@ public class V0_4_1_Demo
 			fullCmd = fullCmd.toLowerCase();
 			String[] cmds = fullCmd.split(" ");
 			boolean pass = true;
+
+			//Log.v();
 			//注意指令case匹配全小写
 			switch(fullCmd){
 				case "help": 
@@ -152,7 +154,8 @@ public class V0_4_1_Demo
 					pass = false;
 					break;
 			}
-			if(!pass)switch(cmds[0]){
+			if(!pass)
+				switch(cmds[0]){
 					case "look": 
 						if(cmds.length>1){
 							switch(cmds[1]){
@@ -167,16 +170,16 @@ public class V0_4_1_Demo
 									matcher.showOtherTrainers();
 									break;
 							}
-						}else{
-							Log.v("指令有误");
 						}
 						break;
 					case "duel": 
 						if(cmds.length>1){
 							targetUuid = Integer.parseInt(cmds[1]);
 							Trainer target = matcher.getTrainer(targetUuid);
-							Log.v("发起对局：%s vs %s.", player.displayName(), target.displayName());
-							matcher.attemptEnterDuel(target);
+							if(target != null){
+								Log.v("发起对局：%s vs %s.", player.displayName(), target.displayName());
+								matcher.attemptEnterDuel(target);
+							}
 						}
 						break;
 					case "shop": 

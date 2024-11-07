@@ -1,5 +1,7 @@
 package consolepokemon.core.items;
+import com.goldsprite.consolepokemon.DebugWindow;
 import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -10,7 +12,6 @@ import consolepokemon.core.trainers.HumanTrainer;
 import consolepokemon.core.yabis.Yabi;
 import java.lang.reflect.Type;
 import tools.Log;
-import com.google.gson.JsonDeserializer;
 
 public abstract class Item {
 
@@ -37,8 +38,9 @@ public abstract class Item {
 				Item item = context.deserialize(jsonObject.get("data"), clazz);
 				return item;
 			} catch (ClassNotFoundException e) {
-				throw new JsonParseException("Unknown type: " + typeName, e);
+				DebugWindow.addErrLog(new JsonParseException("Unknown type: " + typeName, e));
 			}
+			return null;
 		}
 	}
 

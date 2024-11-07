@@ -149,7 +149,7 @@ public class TrainerDuelSystem extends TurnSystem<Trainer>
 	
 	public void cgYabi(Trainer you, Yabi now){
 		if(now == null){
-			throw new IllegalArgumentException("没有找到想要切换到的亚比.");
+			Log.v("没有找到想要切换到的亚比.");
 		}
 		you.setCurrentYabi(now.getUuid());
 		List<Yabi> youEngagedYabis = engagedYabis.get(duelers.indexOf(you));

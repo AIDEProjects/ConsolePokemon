@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import tools.Log;
 import consolepokemon.core.systems.GCore;
+import com.goldsprite.consolepokemon.DebugWindow;
 
 public class Inventory
 {
@@ -55,7 +56,7 @@ public class Inventory
 					Item item = context.deserialize(dataElement, clazz);
 					inventory.addItem(item);
 				} catch (ClassNotFoundException e) {
-					throw new JsonParseException("Unknown type: " + typeName, e);
+					DebugWindow.addErrLog(new JsonParseException("Unknown type: " + typeName, e));
 				}
 			}
 

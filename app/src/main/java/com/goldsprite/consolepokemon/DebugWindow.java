@@ -170,6 +170,7 @@ public class DebugWindow {
 		StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
 		addLog("e", "Err: \n"+sw.toString());
+		MainActivity.toast("注意，运行时抛出了一个新的报错在Log");
 	}
 
 

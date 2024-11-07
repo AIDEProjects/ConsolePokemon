@@ -1,11 +1,15 @@
 package consolepokemon.core.systems;
-import consolepokemon.core.trainers.*;
-import java.util.*;
-import tools.*;
-import consolepokemon.core.systems.turnsystem.*;
-import java.util.function.*;
-import consolepokemon.core.utils.*;
-import consolepokemon.core.yabis.*;
+import com.goldsprite.consolepokemon.DebugWindow;
+import consolepokemon.core.trainers.Trainer;
+import consolepokemon.core.trainers.WildYabi;
+import consolepokemon.core.utils.Utils;
+import consolepokemon.core.yabis.QuickRabbit;
+import consolepokemon.core.yabis.TorpidWooden;
+import consolepokemon.core.yabis.Yabi;
+import java.util.LinkedHashMap;
+import java.util.NoSuchElementException;
+import java.util.function.Consumer;
+import tools.Log;
 
 public class DuelMatcher
 {
@@ -27,14 +31,14 @@ public class DuelMatcher
 	
 	//是否符合进入对决条件
 	public boolean canEnterDuel(Trainer target){
-		Yabi defeatCurrentYabi = getBindTrainer().getCurrentYabi().isAlive()?(target.getCurrentYabi().isAlive()?null:target.getCurrentYabi()):getBindTrainer().getCurrentYabi();
-		if(defeatCurrentYabi != null){
-			Log.v("进入对决失败，原因：%s首战亚比已战败.", defeatCurrentYabi);
-			return false;
-		}
 		Trainer defeatTrainer = getBindTrainer().hasActiveYabi()?(target.hasActiveYabi()?null:target):getBindTrainer();
 		if(defeatTrainer != null){
 			Log.v("进入对决失败，原因：%s无可出战亚比.", defeatTrainer.displayRepos());
+			return false;
+		}
+		Yabi defeatCurrentYabi = getBindTrainer().getCurrentYabi().isAlive()?(target.getCurrentYabi().isAlive()?null:target.getCurrentYabi()):getBindTrainer().getCurrentYabi();
+		if(defeatCurrentYabi != null){
+			Log.v("进入对决失败，原因：%s首战亚比已战败.", defeatCurrentYabi);
 			return false;
 		}
 		return true;
@@ -80,7 +84,7 @@ public class DuelMatcher
 	public Trainer getTrainer(long uuid){
 		Trainer trainer = worldTrainers.get(uuid);
 		if(trainer == null){
-			throw new NoSuchElementException(String.format("没有找到Uuid为%d的训练家.", uuid));
+			Log.v(String.format("没有找到Uuid为%d的训练家.", uuid));
 		}
 		return trainer;
 	}

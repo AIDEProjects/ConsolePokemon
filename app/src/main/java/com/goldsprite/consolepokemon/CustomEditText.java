@@ -17,18 +17,27 @@ import android.view.View.OnKeyListener;
 import android.text.StaticLayout;
 import android.text.Layout;
 import android.text.StaticLayout.Builder;
+import android.graphics.Typeface;
 
 public class CustomEditText extends View {
 
-    private TextPaint textPaint;
+    private TextPaint paint;
     private StringBuilder inputText = new StringBuilder();
-    private int textX = 10; 
-    private int textY = 20; 
+    private int textX = 0; 
+    private int textY = 0; 
     private InputMethodManager imm;
 
 	private int cursorPosition = 0;  // 当前光标位置
     private boolean cursorVisible = true;  // 光标可见性
     private final int BLINK_INTERVAL = 500;
+	private final Runnable cursorBlinkRunnable = new Runnable() {
+        @Override
+        public void run() {
+            cursorVisible = !cursorVisible;
+            invalidate();  // 重新绘制光标
+            postDelayed(this, BLINK_INTERVAL);
+        }
+    };
 
 	private StaticLayout staticLayout;
 
@@ -44,6 +53,10 @@ public class CustomEditText extends View {
 	private int initialHeight;
 
 	private float lineSpacing = 10;
+	
+	private int maxLineCount = 100;
+
+	private StaticLayout emptyLinesLayout;
 
 
     public CustomEditText(Context context) {
@@ -71,14 +84,31 @@ public class CustomEditText extends View {
 	}
 
     private void init(Context context) {
-        textPaint = new TextPaint();
-        textPaint.setColor(0xFFFFFFFF);
-        textPaint.setTextSize(46);
-		textPaint.setAntiAlias(false);
-		//postDelayed(cursorBlinkRunnable, BLINK_INTERVAL);
-
+        paint = new TextPaint();
+        paint.setColor(0xFFFFFFFF);
+        paint.setTextSize(38);
+		paint.setAntiAlias(false);
+		paint.setTypeface(Typeface.MONOSPACE);
+		
         imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-
+		
+		post(cursorBlinkRunnable);
+		post(new Runnable(){
+			public void run(){
+				invalidate();
+			}
+		});
+		
+		String text = "";
+		for(int i=0;i<50;i++){
+			text += "\n";
+		}
+		emptyLinesLayout = StaticLayout.Builder.obtain(text, 0, text.length(), paint, viewWidth)
+			.setAlignment(Layout.Alignment.ALIGN_NORMAL) // 设置对齐方式
+			.setLineSpacing(lineSpacing-paint.getFontMetrics().bottom, 1.0f) // 设置行间距
+			.setMaxLines(Integer.MAX_VALUE) // 设置最大行数
+			.setIncludePad(false)
+			.build();
     }
 
 	@Override
@@ -86,6 +116,8 @@ public class CustomEditText extends View {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         viewWidth = MeasureSpec.getSize(widthMeasureSpec);
         viewHeight = MeasureSpec.getSize(heightMeasureSpec);
+		setMeasuredDimension(viewWidth, viewHeight); // 设置视图大小
+		
 		DebugWindow.setDebugInfo(2, String.format("viewWidth: %d, viewHeight: %d", viewWidth, viewHeight));
 
 		// 如果还没有初始化过高度，则进行初始化
@@ -106,7 +138,7 @@ public class CustomEditText extends View {
 			int ajustpanDiff = 0;
 			if (staticLayout != null){
 				if(getHeight(staticLayout) > viewHeight) {
-					ajustpanDiff = viewHeight - getHeight(staticLayout) - 10;
+					ajustpanDiff = viewHeight - getHeight(staticLayout);
 				}
 				canvas.translate(0 * offsetX + textX, offsetY + textY + ajustpanDiff); // 应用偏移量
 			}
@@ -133,11 +165,11 @@ public class CustomEditText extends View {
 		float cursorY = staticLayout.getLineBaseline(cursorLine) + staticLayout.getTopPadding(); // 加入上填充
 
 		// 获取 TextPaint 的 FontMetrics
-		TextPaint.FontMetrics fontMetrics = textPaint.getFontMetrics();
+		TextPaint.FontMetrics fontMetrics = paint.getFontMetrics();
 
 		// 设置光标的颜色和宽度
-		int oldColor = textPaint.getColor();
-		textPaint.setColor(Color.RED); // 设定光标颜色
+		int oldColor = paint.getColor();
+		paint.setColor(Color.RED); // 设定光标颜色
 		float cursorWidth = 8; // 光标宽度
 		float offsetX = 2; // 偏移量
 		float offsetY = 4;
@@ -149,10 +181,10 @@ public class CustomEditText extends View {
 		float rectBottom = cursorY + fontMetrics.descent +offsetY;      // 矩形的下边界
 
 		// 绘制光标矩形
-		canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, textPaint);
+		canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, paint);
 
 		// 恢复原来的颜色
-		textPaint.setColor(oldColor);
+		paint.setColor(oldColor);
 	}
 	
 
@@ -160,45 +192,21 @@ public class CustomEditText extends View {
 	private void drawText(Canvas canvas) {
 		// 使用 StaticLayout.Builder 创建 StaticLayout
 		String text = inputText.toString();
-		staticLayout = StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, viewWidth)
+		staticLayout = StaticLayout.Builder.obtain(text, 0, text.length(), paint, viewWidth)
 			.setAlignment(Layout.Alignment.ALIGN_NORMAL) // 设置对齐方式
-			.setLineSpacing(lineSpacing-textPaint.getFontMetrics().bottom, 1.0f) // 设置行间距
+			.setLineSpacing(lineSpacing-paint.getFontMetrics().bottom, 1.0f) // 设置行间距
 			.setMaxLines(Integer.MAX_VALUE) // 设置最大行数
 			.setIncludePad(false)
 			.build();
-		setMeasuredDimension(viewWidth, getHeight(staticLayout)); // 设置视图大小
 		staticLayout.draw(canvas);
+		
+		emptyLinesLayout.draw(canvas);
+		setMeasuredDimension(viewWidth, getHeight(staticLayout)+emptyLinesLayout.getHeight()); // 设置视图大小
 	}
 
 	public int getHeight(StaticLayout staticLayout) {
-		return staticLayout.getHeight() + (int)(inputText.toString().endsWith("\n") ?textPaint.getTextSize() + lineSpacing: 0);
+		return staticLayout.getHeight();// + (int)(inputText.toString().endsWith("\n") ?paint.getTextSize() + lineSpacing: 0);
 	}
-
-
-	private final Runnable cursorBlinkRunnable = new Runnable() {
-        @Override
-        public void run() {
-            cursorVisible = !cursorVisible;
-            invalidate();  // 重新绘制光标
-            postDelayed(this, BLINK_INTERVAL);
-        }
-    };
-
-	private String getCurrentLine(int position) {
-        String[] lines = inputText.toString().split("\n");
-        int charCount = 0;
-        for (String line : lines) {
-            charCount += line.length() + 1; // +1 for newline
-            if (charCount > position) {
-                return line;
-            }
-        }
-        return ""; // 如果没有找到则返回空字符串
-    }
-
-	private int getLineIndexFromPosition(int position) {
-		return staticLayout.getLineCount();
-    }
 
 	public void moveCursor(int offset) {
         cursorPosition = Math.max(0, Math.min(inputText.length(), cursorPosition + offset));
@@ -260,8 +268,25 @@ public class CustomEditText extends View {
 
 	public void addText(String str) {
 		inputText.append(str);
+		limitLineCount();
 		moveCursor(inputText.length());
 		invalidate(); // 刷新视图以重绘
+	}
+	
+
+	public void limitLineCount(){
+		int index = inputText.length()-1;
+		for(int i=0;i<maxLineCount;i++){
+			int temp = inputText.lastIndexOf("\n", index);
+			if(temp == -1){
+				return;
+			}
+			index = temp - 1;
+		}
+
+		String temp = inputText.substring(index+2, inputText.length());
+		inputText.setLength(0);
+		inputText.append(temp);
 	}
 
 	public void delChar() {
@@ -302,15 +327,17 @@ public class CustomEditText extends View {
         public boolean sendKeyEvent(KeyEvent event) {
             // 处理换行符
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                if (completedInputListener != null) {
+				if (completedInputListener != null) {
 					completedInputListener.onCompletedInput();
 				}
 				addText("\n");
                 return true;
             }
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-                return true;
-				//return deleteSurroundingText(1, 0);
+                if(inputText.toString().endsWith("\n")){
+					return true;
+				}
+				return deleteSurroundingText(1, 0);
             }
 			/*else if(onKeyListener != null){
 			 onKeyListener.onKey(CustomEditText.this, event.getKeyCode(), event);
